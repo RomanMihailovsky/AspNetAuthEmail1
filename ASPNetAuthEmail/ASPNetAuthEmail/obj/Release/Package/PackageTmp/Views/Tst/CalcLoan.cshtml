@@ -1,0 +1,339 @@
+﻿
+@{
+    ViewBag.Title = "CalcLoan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    input[type=range] {
+        -webkit-appearance: none;
+    }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 400px;
+            height: 5px;
+            background: #ddd;
+            border: none;
+            border-radius: 3px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #035450;
+            margin-top: -6px;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #ccc;
+        }
+
+</style>
+
+<script>
+
+    function getStavka(product, kz) {
+
+        var stavka = 0.00;
+        if (kz < 1) {
+            kz = kz * 100;
+        }
+
+        // Стандарт "Готовое жилье" 
+        if (product == 14) {
+            if (kz > 10 && kz <= 50)
+                stavka = 9.00;
+            if (kz > 50 && kz <= 70)
+                stavka = 9.25;
+            if (kz > 70 && kz <= 80)
+                stavka = 9.25;
+        }
+
+        // Перекредитовка и Новостройка
+        if (product == 16 || product == 18) {
+            if ((kz > 10) && (kz <= 50))
+                stavka = 8.75;
+            if ((kz > 50) && (kz <= 70))
+                stavka = 9.00;
+            if ((kz > 70) && (kz <= 80))
+                stavka = 9.00;
+        }
+
+        // Радуга с ограничением по  сумме займа
+        if (product == 20)
+            stavka = 14;
+
+        return stavka;
+    }
+
+
+    function calcLoanOnChangeFirstPayment() {
+
+        var price = document.getElementById("lineprice").value;
+        var duration = document.getElementById("lineDuration").value;
+        var fpayment = document.getElementById("line_fpayment").value;        
+
+        var elprice = document.getElementById("strprice");  // Привязка элемента к var
+        var elDuration = document.getElementById("strDuration"); // Привязка элемента к var
+        var elfpayment = document.getElementById("str_fpayment");  // Привязка элемента к var
+
+        elprice.innerHTML = price.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+        elDuration.innerHTML = duration + " месяцев";
+
+        //// *********** При изменении ПВ
+        var zaim = Math.round(price - fpayment); // Сумма займа
+        // Остальное всё так же, кроме установки Min-Max значений первоначального займа
+
+        // Отобразим Цифрами значение Бегунка
+        elfpayment.innerHTML = fpayment.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+
+        // ********** Ставка получить в зависимости от kz = zaim / price  ************        
+        var product = document.getElementById("product").value;
+        var kz = (zaim / price);
+        var stavka = getStavka(product, kz); // Ф-я javascript видит внешние переменные
+
+        var annuit = Math.round(zaim * ((stavka / 1200) / (1 - Math.pow(1 + (stavka / 1200), 2 - duration))));  // Аннуитет
+
+        var incomeA = Math.round(annuit / 0.6); // Необходимый доход
+
+        document.getElementById("annuit").innerHTML = annuit.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+        document.getElementById("stavka").innerHTML = stavka + " %";
+        document.getElementById("zaim").innerHTML = zaim.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+
+        // ********** Проверка Первоначального взноса
+        //document.getElementById("fpayment").innerHTML = Math.round(price - zaim).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";  // ПВ
+
+        document.getElementById("incomeA").innerHTML = incomeA.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";      // Доход
+
+
+    }
+
+    function calcLoan() {
+
+        var minZaim = 0;
+        var maxZaim = 0;
+
+        // Максимальная сумма займа, Испрользуется для ограничения ПВ 
+        var product = document.getElementById("product").value;
+        if (product == 20) { // Радуга
+            minZaim = 100000;
+            maxZaim = 500000;
+        }
+        else {               // АИЖК продукты
+            minZaim = 500000;
+            maxZaim = 10000000;
+        }
+
+        var price = document.getElementById("lineprice").value;
+        var duration = document.getElementById("lineDuration").value;
+        var fpayment = document.getElementById("line_fpayment").value;
+
+        var elprice = document.getElementById("strprice");  // Привязка элемента к var
+        var elDuration = document.getElementById("strDuration"); // Привязка элемента к var
+        var elfpayment = document.getElementById("str_fpayment");  // Привязка элемента к var
+
+        elprice.innerHTML = price.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+        elDuration.innerHTML = duration + " месяцев";
+
+        //// *********** При изменении ПВ
+        //var zaim = Math.round(price - fpayment); // Сумма займа
+        // Остальное всё так же, кроме установки Min-Max значений первоначального займа
+      
+        // ********  При изменении Стоимости жилья
+        // Предварительное значение Суммы займа
+        var zaim = Math.round(price - price * 0.8); // Сумма займа
+        fpayment = Math.round(price - zaim);                
+
+        // Предварительная установки границ ПВ
+        var fpayment_max = Math.round(price - price * 0.2); // **** ПВ-Max
+        var fpayment_min = Math.round(price - price * 0.8); // **** ПВ-Min
+
+        // Увеличение нижней границы ПВ при приближении к Макс.сумме займа
+        var minPV = (price - maxZaim); 
+        if (fpayment_min < minPV )
+        {
+            fpayment_min = minPV;
+        }
+        // Уменьшение верхней границы ПВ при приближении к Миним.сумме займа
+        var maxPV = (price - minZaim);
+        if (fpayment_max > maxPV) {
+            fpayment_max = maxPV;
+        }
+
+        // Корректировка ПВ с учетом изменения верхней границы ПВ
+        if (fpayment > fpayment_max) {
+            fpayment = fpayment_max
+        }
+
+        // Корректировка ПВ с учетом изменения нижней границы ПВ
+        if (fpayment < fpayment_min) {
+            fpayment = fpayment_min
+        }
+
+        // Окончательное значение Суммы займа
+        zaim = Math.round(price - fpayment); 
+            
+        // Вывод на экран ПВ
+        elfpayment.innerHTML = fpayment.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+
+        document.getElementById("fpmin").innerHTML = fpayment_min.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+        document.getElementById("fpmax").innerHTML = fpayment_max.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+
+        document.getElementById("line_fpayment").min = fpayment_min;
+        document.getElementById("line_fpayment").max = fpayment_max;
+        document.getElementById("line_fpayment").value = fpayment;  // Фиксирует значение
+
+        // ********** Ставка получить в зависимости от kz = zaim / price  ************                
+        var product = document.getElementById("product").value;
+        var kz = (zaim / price);
+        var stavka = getStavka(product, kz); // Ф-я javascript видит внешние переменные
+
+        var annuit = Math.round(zaim * ((stavka / 1200) / (1 - Math.pow(1 + (stavka / 1200), 2 - duration))));  // Аннуитет
+
+        var incomeA = Math.round( annuit / 0.6 ); // Необходимый доход
+
+        document.getElementById("stavka").innerHTML = stavka + " %";
+        document.getElementById("zaim").innerHTML = zaim.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+
+        // Ежемесячный платеж
+        document.getElementById("annuit").innerHTML = annuit.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+        // Необходимый доход
+        document.getElementById("incomeA").innerHTML = incomeA.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";      // Доход
+    }
+
+    function ProductChange() {
+
+        var pricemin = 1;
+        var pricemax = 2;
+        var product = document.getElementById("product").value;
+
+        // Максимальная и Минимальная Стоимость Жилья (Исходя из суммы займа)
+
+        if (product == 20) { // Радуга
+            pricemin = 125000; //  При минимуме заемных средств по продукту и максимуме по КЗ  100 000 / 125000 = 0.8
+            pricemax = 2500000; // При максимуме заемных средств по продукту и минимуме по КЗ  500 000 / 2 500 000 = 0.2
+            srokmin = 12;
+            srokmax = 36;
+        }
+        else {               // АИЖК продукты
+            pricemin = 625000;
+            pricemax = 50000000; // При максимуме заемных средств по продукту и минимуме по КЗ  7 000 000 / 35 000 000 = 0.2
+            srokmin = 36;
+            srokmax = 360;
+        }
+
+        document.getElementById("div_pricemin").innerHTML = pricemin.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+        document.getElementById("div_pricemax").innerHTML = pricemax.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " ₽";
+
+        document.getElementById("lineprice").min = pricemin;
+        document.getElementById("lineprice").max = pricemax;
+        document.getElementById("lineprice").value = pricemin;
+
+        // ***** Срок Радуга 12-36 месяцев  ***** Срок АИЖК 36-360 месяцев
+        document.getElementById("srokmin").innerHTML = srokmin.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " мес.";
+        document.getElementById("srokmax").innerHTML = srokmax.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') + " мес.";
+
+        calcLoan();
+
+    }
+</script>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title> Title </title>
+</head>
+
+<body onload="ProductChange()">
+
+
+    @*---------------------------- НАИМЕНОВАНИЕ ПРОДУКТА --------------------------------------------------------*@
+    <label style=" margin-top:2%">
+    Ипотечный продукт</label>
+
+    <select id="product" onchange="ProductChange()">
+        <option value="14">Готовое жильё</option>        
+        <option value="16">Новостройка</option>
+        <option value="18">Перекредитование</option>        
+        <option value="20">Радуга</option>        
+    </select>
+
+    <br>
+    @*--------------------------------- СТАВКА -------------------------------------------------------------------*@
+    <label style="color: GrayText; font-size: small; margin-right: 10px">Процентная ставка</label>
+    <span id="stavka" style="font-size: medium; font-weight: bold; color: #035450;"> </span>
+    <br>
+    @*---------------------------- СТОИМОСТЬ ЖИЛЬЯ ---------------------------------------------------------------*@
+   
+    <label style="margin-top:1%">Стоимость жилья</label>
+    <span id="strprice" style="font-size: medium; font-weight: bold; color: #035450;"></span>
+    <input type="range" min="500000" max="7000000" id="lineprice" step="100" oninput="calcLoan()" value="0" >
+    <table style="font-size:10px">
+        <th>
+            <span id="div_pricemin"></span>
+        </th>
+        <th width="180px"></th>
+        <th>
+            <span id="div_pricemax"></span>
+        </th>
+    </table>
+    
+    @*-------------------------------- ПВ (Range) -------------------------------------------------------------*@
+    <label style="font-size: small">Первоначальный взнос</label>
+    <span id="str_fpayment" style="font-size: medium; font-weight: bold; color: #035450;"></span>
+    <input type="range" min="0" max="100000" id="line_fpayment" step="100" oninput="calcLoanOnChangeFirstPayment()" value="0">
+    <table style="font-size:10px">
+        <th>
+            <span id="fpmin"></span>
+        </th>
+        <th width="180px"></th>
+        <th>
+            <span id="fpmax"></span>
+        </th>
+    </table>
+    <br>
+    @*---------------------------- СУММА ЗАЙМА-------------------------------------------------------------------*@
+    <label>Сумма займа</label>
+    <span id="zaim" style="font-size: medium; font-weight: bold; color: #035450;"></span>
+    <br>
+
+    @*--------------------------------- СРОК ЗАЙМА ---------------------------------------------------------------*@
+    <label style="margin-top: 2%; font-size: small; ">Срок займа</label>
+    <span id="strDuration" style="font-size: medium; font-weight: bold; color: #035450;"></span>
+    <input type="range" min="36" max="360" id="lineDuration" oninput="calcLoanOnChangeFirstPayment()" value="0">
+    <table style="font-size:10px">
+        <th>
+            <span id="srokmin"></span>
+        </th>
+        <th width="200px"></th>
+        <th>
+            <span id="srokmax"></span>
+        </th>
+    </table>
+
+    @*-------------------------------------------------------------------------------------------------------------*@
+
+    <label style="color:GrayText; font-size: small">Ежемесячный платеж</label> <span id="annuit" style="font-size: medium; font-weight: bold; color: #035450;"></span>
+    <br>
+
+    <label style="color:GrayText; font-size: small">Необходимый доход</label>  <span id="incomeA" style="font-size: medium; font-weight: bold; color: #035450;"> </span>
+    @*-------------------------------------------------------------------------------------------------------------*@
+
+    @*<input class="form-control" id="ind_zaim" type="text" value="0"/>*@
+
+</body>
+
+</html>
+

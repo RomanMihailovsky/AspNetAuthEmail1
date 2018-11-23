@@ -1,0 +1,72 @@
+﻿
+<script>
+    function onChangeSelect() {
+        var idrealtor = +document.getElementById('realtor').value;
+        //alert(idrealtor);
+        if (idrealtor > 0) {
+            document.getElementById('btaddrltr').style.visibility = "visible";
+        }
+        else {
+            document.getElementById('btaddrltr').style.visibility = "hidden";
+        }
+
+        document.getElementById('idrealtor').value = idrealtor;
+
+    }
+
+    function OnSuccess(data) {
+        var results = $('#idrealtor'); // получаем нужный элемент
+        results.empty(); //очищаем элемент
+        results.append( 'value='+ data);
+        //for (var i = 0; i < data.length; i++) {
+        //    results.append('<li>' + data[i].Name + '</li>'); // добавляем данные в список
+        //}
+    }
+
+
+      $(function () {
+          $('.link').click(function () {
+              var idrlt = $("#idrealtor").val();
+              this.href = this.href.replace("xxx", idrlt);
+          });
+      });
+    
+
+</script>
+
+@model IEnumerable<ASPNetAuthEmail.Models.Realtors>
+
+<div>
+
+       <label style="margin-left: 2%;  color: navy">Выбор риэлтора</label>
+
+        <select id="realtor"  name="realtor" style="margin-top: 0px; margin-bottom: 5px" onchange="onChangeSelect()">
+
+            <option selected value="0"></option>
+
+            @foreach (var item in Model)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+
+        @*@Html.DropDownListFor(model => model., ViewBag.PValues as SelectList,
+                                 new { @class = "form-control", @id = "ddProduct", @style = "font-size: 11px", @onchange = "" /**/ })*@
+
+@*@using (Ajax.BeginForm("JsonSearch", new AjaxOptions { OnSuccess = "OnSuccess" }))*@
+@*@using ( Html.BeginForm("AddSaveRealtor", "Tst", FormMethod.Get ) )
+{
+     <input type="submit" value="Добавить риэлтора в заявку" class="btn btn-primary" style="font-size: 10px;" />
+}*@
+
+    @*@Html.ActionLink("Добавить риэлтора в заявку", "AddSaveRealtor", new { idorder = @ViewBag.Id_order, idrealtor = 1 }, new { @class = "btn btn-primary", @style = "font-size: 10px; margin-left: 5px" })*@
+
+    <input id="idrealtor" name="idrealtor" type="hidden" value="0" />
+    <input id="idorder" name="idorder" type="hidden" value=@ViewBag.Id_order />
+
+    <p></p>
+
+    @Html.ActionLink("Добавить риэлтора в заявку", "AddSaveRealtor", new { idorder = @ViewBag.Id_order, idrealtor = "xxx" }, new { @id = "btaddrltr", @class = "link", @style = "font-size: 10px; margin-left: 5px; visibility: hidden" })
+
+
+</div>

@@ -1,0 +1,356 @@
+﻿
+
+@model IEnumerable<ASPNetAuthEmail.Models.CRM_CalcLoan>
+
+<div style="font-size: 11px">
+
+@foreach (var item in Model)
+{
+    <p hidden>@item.id_ab</p>
+    <p hidden>@item.ProductValue</p>
+   
+       
+    <h4>Предварительный расчет параметров кредитования</h4>
+        
+    if (item.ProductValue == 59)
+    { 
+        <h5>Продукт: "Заем под материнский капитал"</h5>
+    }
+    else
+    {     
+        <h5>Продукт: "@item.ProductName"</h5>
+    }
+    
+    if (item.options != "")
+    {                                     
+        @Html.Action("PrevOptionsProduct", new { id_product = item.ProductValue, options = item.options })
+    }
+
+        
+    if (item.mat_kapital > 0)
+    {
+        <h5>Материнский капитал: &nbsp @item.mat_kapital руб.</h5>
+    }
+        
+    <h5>Сумма кредита: &nbsp @item.zaim руб.</h5>
+    <h5>Сумма первонач.взноса: &nbsp @item.perv_vznos руб.</h5>
+    <h5>Стоимость жилья: &nbsp @item.price руб.</h5>
+        
+    if  (item.stavka < 3)
+    {        
+        <h5>Процентная ставка: <span style="color: red">НЕ РАСЧИТАНА (Не соответствует один из параметров: Минимальная сумма займа, коэфф. Кредит/Заем для продукта)</span> </h5>
+    }
+    else
+    { 
+        <h5>Процентная ставка: &nbsp @item.stavka %</h5>
+    
+        if (item.ProductValue == 51 || item.ProductValue == 53)
+        {
+            <h5>Процентная ставка (до регистрации ипотеки): &nbsp @item.HiStavka %</h5>
+        }    
+    
+        if (item.ProductValue == 54 || item.ProductValue == 55)
+        {
+            <h5>Процентная ставка (после @item.srokFirst мес.): &nbsp @item.HiStavka %</h5>
+        }
+    
+    }
+    
+
+    <h5>Количество несоверш-х детей: &nbsp @item.dety</h5>
+    
+    <h5>Количество заемщиков для расчёта платежеспособности: &nbsp @item.cntPerson</h5>
+        
+    <p></p>
+
+        <table class="table">
+            <tr style="background-color: #e5dede">
+                <td>Доходы:</td>
+                <td style ="text-align:right">Заемщик 1</td>
+                @if ( item.cntPerson > 1 || item.dohod2 > 0 )
+                {
+                    <td style ="text-align:right">Заемщик 2</td>
+                }
+                @if (item.cntPerson > 2 || item.dohod3 > 0)
+                {
+                    <td style ="text-align:right">Заемщик 3</td>
+                }
+                @if (item.cntPerson > 3 || item.dohod4 > 0)
+                {
+                    <td style ="text-align:right">Заемщик 4</td>
+                }
+            </tr>
+            <tr>
+                <td>Средний доход</td>
+                <td style ="text-align:right">@item.dohod1</td>
+                @if (item.cntPerson > 1 || item.dohod2 > 1 )
+                {
+                    <td style ="text-align:right">@item.dohod2</td>
+                }
+                @if (item.cntPerson > 2 || item.dohod3 > 0 )
+                {
+                    <td style ="text-align:right">@item.dohod3</td>
+                }
+                @if (item.cntPerson > 3 || item.dohod4 > 0 )
+                {
+                    <td style ="text-align:right">@item.dohod4</td>
+                }
+            </tr>
+        @*</table>        
+        <table class="table">*@
+            <tr style="background-color: #e5dede">
+                <td>Обязательства:</td>
+                <td style ="text-align:right">Заемщик 1</td>
+                @if (item.cntPerson > 1 || item.rashod2 > 1)
+                {
+                    <td style ="text-align:right">Заемщик 2</td>
+                }
+                @if (item.cntPerson > 2 || item.rashod3 > 1)
+                {
+                    <td style ="text-align:right">Заемщик 3</td>
+                }
+                @if (item.cntPerson > 3 || item.rashod4 > 1)
+                {
+                    <td style ="text-align:right">Заемщик 4</td>
+                }
+            </tr>
+            <tr>
+                <td>Алименты</td>
+                <td style ="text-align:right">@item.alim1</td>
+                @if (item.cntPerson > 1 || item.rashod2 > 1)
+                {
+                    <td style ="text-align:right">@item.alim2</td>
+                }
+                @if (item.cntPerson > 2 || item.rashod3 > 1)
+                {
+                    <td style ="text-align:right">@item.alim3</td>
+                }
+                @if (item.cntPerson > 3 || item.rashod4 > 1)
+                {
+                    <td style ="text-align:right">@item.alim4</td>
+                }
+            </tr>
+            <tr>
+                <td>Ежем.платежи по текущим кредитам</td>
+                <td style ="text-align:right">@item.cred1</td>
+                @if (item.cntPerson > 1 || item.rashod2 > 1)
+                {
+                    <td style ="text-align:right">@item.cred2</td>
+                }
+                @if (item.cntPerson > 2 || item.rashod3 > 1)
+                {
+                    <td style ="text-align:right">@item.cred3</td>
+                }
+                @if (item.cntPerson > 3 || item.rashod4 > 1)
+                {
+                    <td style ="text-align:right">@item.cred4</td>
+                }
+            </tr>
+            <tr>
+                <td>Лимит по кредитным картам</td>
+                <td style ="text-align:right">@item.card1</td>
+                @if (item.cntPerson > 1 || item.rashod2 > 1)
+                {
+                    <td style ="text-align:right">@item.card2</td>
+                }
+                @if (item.cntPerson > 2 || item.rashod3 > 1)
+                {
+                    <td style ="text-align:right">@item.card3</td>
+                }   
+                @if (item.cntPerson > 3 || item.rashod4 > 1)
+                {
+                    <td style ="text-align:right">@item.card4</td>
+                }
+            </tr>
+        </table>    
+        
+        <table class="table">
+            <tr style="background-color: #e5dede">
+                <td>Срок кредита, мес.</td>
+                <td style="text-align:right">@item.srok</td>
+
+                @if ( ! ( item.ProductValue == 39 || item.ProductValue == 49 || item.ProductValue == 59) )
+                { 
+                    <td style ="text-align:right">180</td>
+                    <td style ="text-align:right">240</td>
+                    <td style ="text-align:right">300</td>
+                    <td style ="text-align:right">360</td>
+                }
+            </tr>
+            <tr>
+                @if (!(item.ProductValue == 39 || item.ProductValue == 49 || item.ProductValue == 59))
+                {
+                    <td>Ежемесячный платеж</td>
+                    <td style ="text-align:right">@item.AnSrok</td>
+                    <td style ="text-align:right">@item.An180</td>
+                    <td style ="text-align:right">@item.An240</td>
+                    <td style ="text-align:right">@item.An300</td>
+                    <td style ="text-align:right">@item.An360</td>
+                }
+            </tr>
+
+            <tr>
+                @if (item.mat_kapital > 0)
+                {
+                    <td>Ежемесячный платеж после МСК</td>
+                    <td style ="text-align:right">@item.AnSrok_Chg</td>
+                    <td style ="text-align:right">@item.An180_Chg</td>
+                    <td style ="text-align:right">@item.An240_Chg</td>
+                    <td style ="text-align:right">@item.An300_Chg</td>
+                    <td style ="text-align:right">@item.An360_Chg</td>
+
+                }
+
+                @if (item.ProductValue == 51 || item.ProductValue == 53)
+                {
+                    <td>Ежемесячный платеж до РИ</td>
+                    <td style ="text-align:right">@item.AnSrok_Chg</td>
+                    <td style ="text-align:right">@item.An180_Chg</td>
+                    <td style ="text-align:right">@item.An240_Chg</td>
+                    <td style ="text-align:right">@item.An300_Chg</td>
+                    <td style ="text-align:right">@item.An360_Chg</td>
+
+                }
+
+                @if (item.ProductValue == 54 || item.ProductValue == 55)
+                {
+                    <td>Ежемесячный платеж (после @item.srokFirst мес.)</td>
+                    <td style ="text-align:right">@item.AnSrok_Chg</td>
+                    <td style ="text-align:right">@item.An180_Chg</td>
+                    <td style ="text-align:right">@item.An240_Chg</td>
+                    <td style ="text-align:right">@item.An300_Chg</td>
+                    <td style ="text-align:right">@item.An360_Chg</td>
+                }
+            </tr>
+
+            @if (item.ProductValue == 54 || item.ProductValue == 55)
+            {
+                <tr>
+                    <td>Сумма плановых процентов (СИ)</td>
+                    <td style ="text-align:right">@item.SppSr_Fml</td>
+                    <td style ="text-align:right">@item.Spp180_Fml</td>
+                    <td style ="text-align:right">@item.Spp240_Fml</td>
+                    <td style ="text-align:right">@item.Spp300_Fml</td>
+                    <td style ="text-align:right">@item.Spp360_Fml</td>
+                </tr>
+            }
+
+            else if (item.ProductValue == 39 || item.ProductValue == 49 || item.ProductValue == 59)
+            {
+                <tr>
+                    <td>Сумма плановых процентов</td>
+                    <td>@item.SppSr_Diff</td>
+                </tr>
+            }
+            
+            else if (item.mat_kapital > 0)
+            {
+                <tr>
+                    <td>Сумма плановых процентов (МК)</td>
+                    <td style ="text-align:right">@item.SppSr_MK</td>
+                    <td style ="text-align:right">@item.Spp180_MK</td>
+                    <td style ="text-align:right">@item.Spp240_MK</td>
+                    <td style ="text-align:right">@item.Spp300_MK</td>
+                    <td style ="text-align:right">@item.Spp360_MK</td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>Сумма плановых процентов</td>
+                    <td style ="text-align:right">@item.SppSr</td>
+                    <td style ="text-align:right">@item.Spp180</td>
+                    <td style ="text-align:right">@item.Spp240</td>
+                    <td style ="text-align:right">@item.Spp300</td>
+                    <td style ="text-align:right">@item.Spp360</td>
+                </tr>
+            }
+
+        </table> 
+    
+    <h5>Расходы по получению займа</h5>
+    <table class="table">
+        <tr>
+            <td>Оплата услуг по оформлению займа</td>
+            <td style="text-align:right">0</td>
+        </tr>
+        <tr>
+            <td>Единовременные расходы, связанные с проведением оценки (ориентировочно)</td>
+            <td style="text-align:right">1700</td>
+        </tr>
+        <tr>
+            @if (item.ProductValue == 59)
+            {
+                <td>Расходы, связанные с имущественным страхованием (ориентировочно)</td>
+            }
+            else
+            { 
+                <td>Расходы, связанные с личным и имущественным страхованием за первый год страхования (ориентировочно)</td>
+            }
+            <td style ="text-align:right">@item.Strah</td>
+        </tr>
+
+        @if (item.ProductValue == 59)
+        {
+            <tr>
+               <td>Обеспечительный платеж</td>
+                <td style="text-align:right">@item.SppSr_Diff</td>
+            </tr>
+
+            <tr>            
+               <td>Единовременный для снижения процентной ставки</td>
+               <td style="text-align:right">@item.Pay_59_Diff</td>
+            </tr>
+            
+            <tr>
+                <td><h5>Всего</h5></td>
+                <td style="text-align:right"><h5>@item.OnceDebt</h5></td>
+            </tr>
+
+         }
+
+
+</table>
+
+      <div style="font-style:italic">
+        @if (item.ProductValue == 45  || item.ProductValue == 57)  /*Приобретение на этапе строительства*/ /*Приобретение на этапе строительства (льготная)*/
+        {
+            <p>Государственная пошлина за государственную регистрацию ипотеки (Управление Федеральной регистрационной службы кадастра и картографии по УР) (ст. 333.33 НК РФ). </p>
+            <p>Комиссия за перечисление суммы займа в счет погашения предшествующего кредита/займа 2000 рублей</p>
+        }
+        else if (item.ProductValue == 47   /* Перекредитование */ || item.ProductValue == 51 || item.ProductValue == 53)  // КПК c 02 окт
+        {
+            <p>Государственная пошлина за государственную регистрацию ипотеки (Управление Федеральной регистрационной службы кадастра и картографии по УР) (ст. 333.33 НК РФ).</p>
+            <p>Комиссия за перечисление суммы займа в счет погашения предшествующего кредита/займа 1000 рублей</p>
+        }
+
+        @if (item.ProductValue == 54 || item.ProductValue == 55) /*Семейная Ипотека*/ /*Семейная Ипотека - КПК*/
+        {
+            <p>Государственная пошлина за государственную регистрацию ипотеки (Управление Федеральной регистрационной службы кадастра и картографии по УР) (ст. 333.33 НК РФ).</p>
+            <p>Комиссия за перечисление суммы займа в счет погашения предшествующего кредита/займа 1000 рублей</p>
+        }
+
+        @if (item.ProductValue == 49 || item.ProductValue == 50
+        || item.ProductValue == 51 || item.ProductValue == 53 || item.ProductValue == 55)
+        {
+            <p>Нотариальные расходы (в случае если вид права собственности «Общая долевая»)  от 6000 до 8000 рублей</p>
+        }
+    </div>
+    
+    <br>
+        <h5>Ваш менеджер АО "ИКУР": @item.userName</h5>
+        <h5>Номер: 777775 доб.@item.userIPNum</h5>
+        <h5>E-mail: @item.userEmail</h5>
+    
+   }
+
+</div>    
+
+        @*@ViewBag.paramOption
+        </br>
+        @ViewBag.decStavka
+    </br>
+        @ViewBag.incStavka*@
+
+
+

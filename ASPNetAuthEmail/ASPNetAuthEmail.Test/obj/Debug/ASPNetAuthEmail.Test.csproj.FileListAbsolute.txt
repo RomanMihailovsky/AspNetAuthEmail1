@@ -1,0 +1,17 @@
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\ASPNetAuthEmail.Test.dll.config
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\ASPNetAuthEmail.Test.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\ASPNetAuthEmail.Test.pdb
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\Moq.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\System.Web.WebPages.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\System.Web.Razor.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\System.Web.WebPages.Deployment.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\Moq.xml
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\System.Web.WebPages.xml
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\System.Web.Razor.xml
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\System.Web.WebPages.Deployment.xml
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\ru\System.Web.WebPages.resources.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\ru\System.Web.Razor.resources.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\bin\Debug\ru\System.Web.WebPages.Deployment.resources.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\obj\Debug\ASPNetAuthEmail.Test.csprojResolveAssemblyReference.cache
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\obj\Debug\ASPNetAuthEmail.Test.dll
+C:\Users\Михайловский\Documents\Visual Studio 2013\Projects\ASPNetAuthEmail\ASPNetAuthEmail.Test\obj\Debug\ASPNetAuthEmail.Test.pdb

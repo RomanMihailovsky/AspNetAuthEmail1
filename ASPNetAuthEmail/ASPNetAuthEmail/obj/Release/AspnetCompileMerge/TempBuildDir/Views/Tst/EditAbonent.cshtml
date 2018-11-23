@@ -1,0 +1,139 @@
+﻿@*<script src="/Scripts/jquery-1.10.2.js"></script>*@
+<script src="/Scripts/jquery-3.3.1.js"></script>
+<script src="/Scripts/jquery.maskedinput.min.js"></script>
+
+<script>
+    $(function () {
+        $("#Phone").mask("(999)999-99-99");
+        $("#BirthDay").mask("99.99.9999", { placeholder: "дд.мм.гггг" });
+    });
+</script>
+
+
+
+@model ASPNetAuthEmail.Models.CRM_Abonent
+
+<!DOCTYPE html>
+
+@{
+    ViewBag.Title = "Редактирование участника заявки";
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>EditAbonent</title>
+</head>
+<body>
+
+
+    @*<div class="container-fluid">*@
+        <div class="col-sm-5" style="font-size: 10px">
+
+            <h5>Участник заявки @ViewData["id_order"] (Редактирование)</h5>
+            @*<h5>Участник заявки @ViewBag.id_order (Редактирование)</h5>*@
+
+            @using (Html.BeginForm("EditAbonent", "Tst", new { idorder = ViewData["id_order"] }, FormMethod.Post, null @*new { enctype = "multipart/form-data" }*@ ))
+            {
+
+                @Html.HiddenFor(m => m.id_ab)
+                
+                if (Model.Prioritet == 1)
+                { 
+                    <label>Основной участник заявки</label>
+                }
+                else
+                { 
+                    @Html.CheckBox("Основной", new { @style = "font-size: 12px" })
+                    <label style="font-size: 12px;">Сделать основным участником заявки</label>
+                }
+
+                <br>
+
+                <label style="margin-bottom: 1px; margin-top: 8px;">Фамилия: </label>
+                @Html.TextBox("SurName", null, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.SurName) <br>
+                
+                <label style="margin-bottom: 1px; margin-top: 8px;">Имя: </label>
+                @Html.TextBox("Name", null, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Name) <br>
+
+                <label style="margin-bottom: 1px; margin-top: 8px;">Отчество: </label>
+                @Html.TextBox("Otch", null, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.Otch) <br>
+
+                <label style="margin-bottom: 1px; margin-top: 8px;">Контактный номер: </label>
+                @Html.TextBox("Phone", null, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.Phone) <br>
+                @*<input type="text" name="phonenum" class="form-control" style="font-size: 10px" /> <br />*@
+
+                <label style="margin-bottom: 1px; margin-top: 8px;">Дата рождения: </label>
+                @Html.TextBox("BirthDay", null, new { @class = "form-control" @*, @style = "font-size: 10px"*@ })
+                @Html.ValidationMessageFor(model => model.BirthDay) <br>
+
+                <p>
+                    @*<h3>@ViewBag.Message</h3>
+
+                    <h3>@TempData["message"]</h3>*@
+            
+                </p>                    @*<p></p> @Html.ValidationSummary()  <p></p>*@
+
+                @* ----------------- [ СОХРАНИТЬ ]  [ К Заявке ]   ---------------------- *@
+                <input type="submit" value="Сохранить" class="btn btn-primary" style="font-size: 10px; margin-right: 2%" />
+                @Html.ActionLink("Возврат к Заявке", "EditOrder", new { id = ViewData["id_order"] }, new { @class = "btn btn-info", @style = "font-size: 10px" })
+                @*@Html.ActionLink("Возврат к Заявке", "EditOrder", new { id = ViewBag.id_order }, new { @class = "btn btn-info", @style = "font-size: 10px" })*@
+
+                @*<input type="month" value="Месяц" style="font-size: 10px" />*@
+            }
+
+            <br>
+
+        </div>
+
+
+        <div class="col-sm-7">
+
+            <label style="font-size: 13px; margin-top: 20px; margin-bottom: 10px">Прикрепление документов...</label>
+
+
+            @using (Html.BeginForm("Upload", "Tst", new { id_order = ViewData["id_order"], id_ab = Model.id_ab }, FormMethod.Post, new { enctype = "multipart/form-data", @style = "font-size: 10px" }))
+            {
+                                
+                @Html.Action("PreviewSPR_DeloDoc")
+                
+                <input type="file" name="upload" style="font-weight: 600; color: orangered; margin-bottom: 20px" />
+
+                if (Model.id_ab < 1)
+                { 
+                    <input disabled type="submit" class="btn btn-warning" style="font-size: 10px; margin-bottom: 20px"  value="Добавить выбранный файл в список документов" /> <br>
+                }
+                else
+                { 
+                    <input type="submit" class="btn btn-warning" style="font-size: 10px; margin-bottom: 20px"  value="Добавить выбранный файл в список документов" /> <br>
+                }
+            }
+
+            @Html.Action("PreviewListDoc", new { id = ViewData["id_ab"] })
+
+        </div>
+
+    @*</div>*@
+</body>
+</html>
+
+
+@*<div class="form-group">
+        <div style="position:relative;font-size:11px">
+            <br>
+            <label>Прикрепленные документы</label>
+            <a class='btn' href='javascript:;' style="font-size: 11px">
+                Добавить файл...
+                <input type="file" name="Image" size="40"
+                       style="position:absolute;z-index:2;top:0;font-size:11px;
+                         left:0;filter: alpha(opacity=0); opacity:0;
+                         background-color:transparent;color:transparent;"
+                       onchange='$("#upload-file-info").html($(this).val());'>
+            </a>
+            <span class='label label-info' id="upload-file-info"></span>
+        </div>
+    </div>*@

@@ -1,0 +1,95 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* styles for validation helpers */
+.field-validation-error {
+    color: #b94a48;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-errors {
+    color: #b94a48;
+}
+
+.validation-summary-valid {
+    display: none;
+}
+
+.class-red {
+   background: red;
+}
+
+.class-mcream {
+   background: #fbf9ee;
+}
+
+.class-mblue {
+   background: #eae4c5;
+}
+
+.class-pinklight {
+   background: #f5aeb5;
+}
+
+.class-bluelight {
+   background: #d9f1f1;
+}
+
+.class-greenlight {
+   background: #a8f6b2;
+}
+
+.class-graylight {
+   background: #dedbdb;
+}
+
+.class-creamlight {
+   background: #f6eec3;
+}
+
+.class-white {
+   background: #fbf9ee; 
+}
+
+.class-width {  
+  width: 400px;
+}
+
+.class-fontnavy {
+   color: #1248b6;
+}
+
+th input {
+   width: 300px;
+}
+
+
+.class-creamlight-ligth {
+   background: #f8f5e4;
+}

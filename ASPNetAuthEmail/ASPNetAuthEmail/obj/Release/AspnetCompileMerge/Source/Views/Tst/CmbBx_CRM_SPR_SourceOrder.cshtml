@@ -1,0 +1,49 @@
+﻿
+<script>
+
+    function SourceOrderChange() {
+        var idvalue = +document.getElementById('sourceorder').value;
+        document.getElementById('idsourceorder').value = idvalue;
+
+    }
+
+    //function OnSuccess(data) {
+    //    var results = $('#idrealtor'); // получаем нужный элемент
+    //    results.empty(); //очищаем элемент
+    //    results.append('value=' + data);
+    //    //for (var i = 0; i < data.length; i++) {
+    //    //    results.append('<li>' + data[i].Name + '</li>'); // добавляем данные в список
+    //    //}
+    //}
+
+    //$(function () {
+    //    $('.link').click(function () {
+    //        var idrlt = $("#idrealtor").val();
+    //        this.href = this.href.replace("xxx", idrlt);
+    //    });
+    //});
+
+</script>
+
+
+@model IEnumerable<ASPNetAuthEmail.Models.CRM_SPR_SourceOrder>
+
+<div>
+
+    <label style="margin-left: 2%;  color: navy">Источник заявки</label>
+
+    <select id="sourceorder" name="sourceorder" class="form-control" onchange="SourceOrderChange()">
+
+        <option selected value="0"></option>
+
+        @foreach (var item in Model)
+        {
+            <option value="@item.Id">@item.Name</option>
+        }
+    </select>
+
+    <input id="idsourceorder" name="idsourceorder" type="hidden" value="0" />
+
+</div>
+
+

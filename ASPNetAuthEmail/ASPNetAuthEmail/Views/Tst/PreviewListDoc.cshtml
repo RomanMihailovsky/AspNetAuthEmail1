@@ -1,0 +1,57 @@
+﻿@*@model IEnumerable<ASPNetAuthEmail.Models.Game>*@
+@*@model ASPNetAuthEmail.Models.CRM_Doc*@
+
+@model IEnumerable<ASPNetAuthEmail.Models.CRM_Docs_V>
+@*@model ASPNetAuthEmail.Models.CRM_DocsViewModel*@
+
+
+<link href="~/Content/Site.css" rel="stylesheet" />
+
+@{
+    ViewBag.Title = "Личный кабинет";
+}
+
+<div class="panel panel-default" style="font-size: 10px;">  @*style="font-size: 11px; color: brown">*@
+    @*<div class="panel-heading">*@
+        @*<h4>Список из Preview</h4>*@
+
+        <h6>Список документов</h6>
+
+        <table class="table table-bordered table-hover">
+            <tr>
+                @*<th class="text-center">№</th>*@
+                <th class="text-center">Тип документа</th>
+                <th class="text-center">Наименование </th>
+                <th class="text-center">Дата, время </th>
+                @*<th class="text-center">Размер, Кбайт </th>*@
+                <th class="text-center">Удал.</th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    @*<td class="text-left" width=" 10">@item.id_doc</td>*@                    
+                    <td class="text-left" width=" 200">@item.description</td>
+                    <td class="text-left" width=" 200">@item.name</td>
+                    <td class="text-left" width=" 150">@item.date </td>
+                    @*<td class="text-left" width=" 150">@item.size </td>*@
+
+                    <td>
+                        @using (Html.BeginForm("RemoveDoc", "Tst"))                        
+                        {
+                            @Html.Hidden("id_doc", item.id_doc )
+                            @Html.Hidden("id_order", item.id_order)
+                            @Html.Hidden("id_ab", item.id_ab)
+                            @Html.Hidden("fileName", item.name)
+                            //@Html.HiddenFor(x => x.ReturnUrl)
+                            <input class="btn btn-sm btn-danger" type="submit" value="X" style="font-size: 10px;" />
+                        }
+                    </td>
+               </tr>
+            }
+
+        </table>
+
+    @*</div>*@
+
+</div>

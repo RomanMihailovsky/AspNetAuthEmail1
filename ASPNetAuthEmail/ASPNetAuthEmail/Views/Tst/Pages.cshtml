@@ -1,0 +1,10 @@
+﻿@using ASPNetAuthEmail.Models
+@using ASPNetAuthEmail.HtmlHelpers
+@model ASPNetAuthEmail.Models.CRM_TabOrd_ViewModel
+
+<div class="btn-group">
+    @Html.PageLinks(Model.PagingInfo, x => Url.Action("Index",
+                new { fsurname = Model.FilterSurName, page = x, iduser = Model.CurrentUser }))
+
+
+</div>

@@ -1,0 +1,447 @@
+﻿
+@model ASPNetAuthEmail.Models.CRM_Abonent
+
+@*@model ASPNetAuthEmail.Models.ParamsLoalViewModel*@
+
+
+@{
+    ViewBag.Title = "EditParamsLoan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>    
+
+    // ***************** Заполняем стоимость жилья если в CRM_Abonent.price = NULL при открытии страницы
+    //function CalcPrice() {
+    //    var zaim = +document.getElementById('zaim').value;
+    //    var price = +document.getElementById('price').value;
+    //    var perv_vznos = +document.getElementById('perv_vznos').value;
+
+    //    // Заполняем стоимость жилья 
+    //    if ( price == 0 && zaim > 0 && perv_vznos > 0)
+    //    {
+    //        price = zaim + perv_vznos;
+    //        document.getElementById('price').value = price;
+    //    }
+
+    //}
+
+    // ************************ Вычислить Сумму займа
+    function CalcEmptyField() {
+        var res = 0;
+        var zaim = +document.getElementById('zaim').value;
+        var price = +document.getElementById('price').value;
+        var perv_vznos = +document.getElementById('perv_vznos').value;
+
+        // Заполняем сумму займа
+        if (price > 0 && perv_vznos >= 0) {
+            zaim = price - perv_vznos;
+            document.getElementById('zaim').value = zaim;
+        }
+
+    }
+
+    //// ************************ Вычислить Первоначальный Взнос (ПВ)
+    //function CalcEmptyField_PriceOrPV() {
+    //    var res = 0;
+    //    var zaim = +document.getElementById('zaim').value;
+    //    var price = +document.getElementById('price').value;
+    //    var perv_vznos = +document.getElementById('perv_vznos').value;
+
+    //    // Заполняем стоимость жилья 
+    //    if (price == 0 && zaim > 0 && perv_vznos > 0) {
+    //        price = zaim + perv_vznos;
+    //        document.getElementById('price').value = price;
+    //    }
+    //    else
+    //        // Заполняем сумму займа
+    //        if (zaim == 0 && price > 0 && perv_vznos > 0) {
+    //            zaim = price - perv_vznos;
+    //            document.getElementById('zaim').value = zaim;
+    //        }
+    //        else
+    //            // Заполняем первоначальный взнос
+    //            if (perv_vznos == 0 && zaim > 0 && price > 0) {
+    //                perv_vznos = price - zaim;
+    //                document.getElementById('perv_vznos').value = perv_vznos;
+    //            }
+
+    //}
+    
+
+    // ********** Формирование в input элементе с id = "options" *******************
+    function OptionsInStr() {
+
+        //alert("optionsIn");
+
+        var optionsIn = "";
+        var inputs = document.getElementsByTagName('input');
+
+        for (var i = 0; i < inputs.length; i++) {
+
+            if (inputs[i].type == 'checkbox' && inputs[i].checked)
+            {
+                //alert(inputs[i].id.toString()); 
+                optionsIn = optionsIn.concat(inputs[i].id.toString(), ',');
+            }
+
+        }
+
+        // -- Добавление id опции МК, потом закомментировать, сделав МК опцией на общих основаниях 
+        //-- ############## Не Работает, т.к. OptionInString вызывается только при работе с CheckList, в котором нет Мат.капитала
+        var mk = document.getElementById('Mat_kapital').value;
+
+        if (mk > 0)
+        {
+            optionsIn = optionsIn.concat('15', ',');
+        }
+
+
+        if (optionsIn.length > 1) {
+            optionsIn = optionsIn.substring(0, optionsIn.length - 1);
+        }
+
+        document.getElementById('optionsIn').value = optionsIn;
+
+        //alert(optionsIn);
+        // $("#optionsIn").val = optionsIn; // не работает
+        
+    }
+
+</script>
+
+<script>    // ****************** Отображение списка опций при загрузке страницы *****************
+    function ShowOptions() {
+        //$("#StateOptions").empty();
+        $("#CheckOptions").empty();
+        //$("#StateOptions").prop("disabled", true);
+
+        // ********* Динамическое формирование CheckList-а Опций
+        if ($("#ddProduct").val() != "Select") {
+            var prodOptions = {};
+            prodOptions.url = "/Tst/JsonGetOptions";
+            prodOptions.type = "POST";
+            prodOptions.data = JSON.stringify({
+                id_product: $("#ddProduct").val()  // JsonGetOptions( id_product присваиваем $("#ddProduct").val()
+            });
+            prodOptions.datatype = "json";
+            prodOptions.contentType = "application/json";
+            prodOptions.success = function (optList) {  // Вызов ф-ии /Tst/JsonGetOptions и возврат значения optList
+
+
+                if (optList.length > 0) {
+                    var elMat_kapital = document.getElementById('Mat_kapital');
+                    var ellbMK = document.getElementById('lbMK');
+
+                    if (optList[0].id_Product == 44 || optList[0].id_Product == 45 || optList[0].id_Product == 57 || optList[0].id_Product == 58) {
+                        elMat_kapital.style.visibility = 'visible';
+                        ellbMK.style.visibility = 'visible';
+                    }
+                    else {
+                        elMat_kapital.style.visibility = 'hidden';
+                        ellbMK.style.visibility = 'hidden';
+                        elMat_kapital.value = 0;
+                    }
+
+                }
+                //$("#options").empty();
+                var optionsIn = document.getElementById('optionsIn').value;
+                for (var i = 0; i < optList.length ; i++) {
+
+                    //$("#StateOptions").append("<option>" + optList[i] + "</option>");
+                    if (optionsIn.indexOf(optList[i].id_Option.toString()) >= 0) {
+                        // -------- Динамическое формирование CheckList-а Опций
+                        $("#CheckOptions").append("<div><label style='font-size: 10px'><input type='checkbox' checked "
+                            + " id=" + optList[i].id_Option
+                            + " onchange='OptionsInStr()'/>"
+                            + optList[i].NameOp + "</label></div>"
+                            );
+                    }
+                    else {
+                        // -------- Динамическое формирование CheckList-а Опций
+                        $("#CheckOptions").append("<div><label style='font-size: 10px'><input type='checkbox' "
+                            + " id=" + optList[i].id_Option
+                            + " onchange='OptionsInStr()'/>"
+                            + optList[i].NameOp + "</label></div>"
+                            );
+                    }
+
+                }
+                //$("#StateOptions").prop("disabled", false);
+            };
+
+            prodOptions.error = function () {
+                alert("Ошибка заполнения Опций !");
+            };
+            $.ajax(prodOptions); // Вызов JsonGetOptions(id_product)
+
+        } else {
+            //$("#StateOptions").empty();
+            //$("#StateOptions").prop("disabled", true);
+        }
+
+        // Заполняем Стоимость жилья если не заполнено
+        //CalcPrice();
+
+    };
+</script>
+
+
+<script>    // ****************** Обновление списка опций после выбора продукта *****************    
+    function onChangeProduct()
+    {
+        document.getElementById('optionsIn').value = 0;
+        //$("#StateOptions").empty();
+        $("#CheckOptions").empty();
+        //$("#StateOptions").prop("disabled", true);
+        
+        // ********* Динамическое формирование CheckList-а Опций
+        if ($("#ddProduct").val() != "Select")
+        {
+            var prodOptions = {};
+            prodOptions.url = "/Tst/JsonGetOptions";
+            prodOptions.type = "POST";
+            prodOptions.data = JSON.stringify({
+                id_product: $("#ddProduct").val()  // JsonGetOptions( id_product присваиваем $("#ddProduct").val()
+            });
+            prodOptions.datatype = "json";
+            prodOptions.contentType = "application/json";
+            prodOptions.success = function (optList) {  // Вызов ф-ии /Tst/JsonGetOptions и возврат значения optList
+
+            if (optList.length > 0)
+            {
+                var elMat_kapital = document.getElementById('Mat_kapital');
+                var ellbMK = document.getElementById('lbMK');
+
+                if (optList[0].id_Product == 44 || optList[0].id_Product == 45 || optList[0].id_Product == 57 || optList[0].id_Product == 58) {
+                    elMat_kapital.style.visibility = 'visible';
+                    ellbMK.style.visibility = 'visible';
+                }
+                else
+                {
+                    elMat_kapital.style.visibility = 'hidden';
+                    ellbMK.style.visibility = 'hidden';
+                    elMat_kapital.value = 0;
+                }
+
+            }
+
+            for (var i = 0; i < optList.length ; i++) {
+
+                var chkd = "";
+                if (optList[i].id_Option == 10)  // Семейная Ипотека, автоматом Checked опция 2-й ребёнок
+                {
+                    chkd = "checked";
+                    document.getElementById('optionsIn').value = '10'  //2-й ребёнок
+                }
+
+                if (optList[i].id_Option == 14)  //Заем под МК, Назначь свою ставку
+                {
+                    chkd = "checked";
+                    document.getElementById('optionsIn').value = '14'  //Назначь свою ставку
+
+                    document.getElementById('price').value = 453026;
+                    document.getElementById('zaim').value = 453026;
+                    document.getElementById('perv_vznos').value = 0;
+                    document.getElementById('srok').value = 3;
+                }
+
+                // -------- Динамическое формирование CheckList-а Опций
+                $("#CheckOptions").append("<div><label style='font-size: 10px'><input type='checkbox' "
+                    + chkd
+                    + " id=" + optList[i].id_Option
+                    + " onchange='OptionsInStr()'/>"
+                    + optList[i].NameOp + "</label></div>"
+                    );
+
+            }
+
+                //$("#StateOptions").prop("disabled", false);
+            };
+
+            prodOptions.error = function() {
+                alert("Ошибка заполнения Опций !");
+            };
+            $.ajax(prodOptions); // Вызов JsonGetOptions(id_product)
+
+        } else 
+        {
+            //$("#StateOptions").empty();
+            //$("#StateOptions").prop("disabled", true);
+        }
+        
+    }; 
+</script>
+
+
+<!DOCTYPE html>
+
+<html>
+
+<body onload="ShowOptions();">
+
+    <h5 style="color: navy">Параметры займа (Редактирование): @Html.DisplayFor(model => model.SurName) @Html.DisplayFor(model => model.Name) @Html.DisplayFor(model => model.Otch)</h5>
+
+@using (Html.BeginForm("EditParamsLoan", "Tst", new { id_order = ViewBag.id_order }, FormMethod.Post))
+{
+
+    <div class="col-sm-6" style="font-size: 10px">
+
+            @*<input type="text" id="productval" name="productval" value="@ViewBag.id_product" /> <br>*@
+
+            @*//ПРИ РАБОТЕ С МОДЕЛЬЮ ОБЯЗАТЕЛЬНО В View ДОЛЖЕН ПРИСУТСТВОВАТЬ KEY МОДЕЛИ*@
+            @Html.HiddenFor(m => m.id_ab)
+
+            @*// А ТАКЖЕ ПОЛЯ КОТОРЫЕ БУДУТ ПРОВЕРЯТЬСЯ В (ModelState.IsValid)*@
+            @Html.HiddenFor(m => m.SurName)
+            @Html.HiddenFor(m => m.Name)
+            @Html.HiddenFor(m => m.Otch)
+            @Html.HiddenFor(m => m.Phone)
+            @Html.HiddenFor(m => m.BirthDay)
+
+            <p>
+                @*//***** Выпадающий список "Наименование продуктов" *******@ @*// *********** Альтернативный вывод DropDownList *****************@
+                @*// *** Можно еще использовать new { onchange = "this.form.submit();"*@
+                <label style="margin-bottom: 1px; margin-top: 10px; color: navy; font-size: 12px">Наименование продукта </label>
+
+                @*@Html.DropDownList("ddProduct", ViewBag.PValues as SelectList,
+                    new { @class = "form-control", @style = "font-size: 11px", @onchange = "onChangeProduct()" })*@
+
+                @Html.DropDownListFor(model => model.ProductValue, ViewBag.PValues as SelectList,
+                                 new { @class = "form-control", @id = "ddProduct", @style = "font-size: 11px", @onchange = "onChangeProduct()" /*Обновление списка опций после выбора продукта*/ })
+            </p>
+
+            <input class="form-control" id="optionsIn" name="optionsIn" type="text" value="@Model.options" style="display: none" />
+
+            @*<p style="margin-bottom: 1px; margin-top: 10px; color: navy; font-size: 11px">Опции</p>*@
+
+            <div id="CheckOptions">
+            </div>
+
+            <label style="margin-bottom: 1px; margin-top: 2px;">Стоимость жилья: </label>
+            @Html.TextBox("price", null, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.price) <br>
+
+            <label style="margin-bottom: 1px; margin-top: 2px;">Первоначальный взнос: </label>
+            @Html.TextBox("perv_vznos", null, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.perv_vznos) <br>
+
+            <label style="margin-bottom: 1px; margin-top: 2px;">Сумма займа: </label>
+            @Html.TextBox("zaim", null, new
+           {
+           @class = "form-control",
+           @style = "background: #d8d3d3" @*, @disabled = "disabled"*@ })
+            @*@Html.HiddenFor(m => m.zaim)*@
+            @Html.ValidationMessageFor(model => model.zaim) <br>
+
+
+            <label style="margin-bottom: 1px; margin-top: 2px;">Срок займа: </label>
+            @Html.TextBox("srok", null, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.srok) <br>
+
+            <label style="margin-bottom: 1px; margin-top: 2px;">Кол-во детей: </label>
+            @Html.TextBox("dety", null, new { @class = "form-control" })
+
+            @*@if (Model.ProductValue == 44 || Model.ProductValue == 45 || Model.ProductValue == 57 || Model.ProductValue == 58)
+            {*@ 
+                <label id="lbMK" style="margin-bottom: 1px; margin-top: 6px;">Мат.капитал: </label>
+                @Html.TextBox("Mat_kapital", null, new { @class = "form-control" })
+
+            @*}*@
+
+            <p>
+                @Html.ValidationSummary(true)
+            </p>
+
+            <label style="margin-bottom: 1px; margin-top: 8px; color: navy; font-size: 11px">Доходы: </label> <br>
+
+            <label style="margin-bottom: 1px; margin-top: 2px;">Заемщик 1: </label>
+            @Html.TextBox("dohod1", null, new { @class = "form-control" })
+            <label style="margin-bottom: 1px; margin-top: 2px;">Заемщик 2: </label>
+            @Html.TextBox("dohod2", null, new { @class = "form-control" })
+            <label style="margin-bottom: 1px; margin-top: 2px;">Заемщик 3: </label>
+            @Html.TextBox("dohod3", null, new { @class = "form-control" })
+            @*<label style="margin-bottom: 1px; margin-top: 2px;">Заемщик 4: </label>
+            @Html.TextBox("dohod4", null, new { @class = "form-control" })*@
+
+            @*------------ Опции с Checkbox / ВОЗМОЖНО УБРАТЬ ИЗ Using (Html.BeginForm("EditParamsLoan", "Tst".... --------------*@
+            @*if (Model != null)
+                {
+                    @Html.Action("PrevCheckOptionsProduct", new
+                   {
+                       id_product = Model.ProductValue,
+                       options = Model.options })
+                }
+
+                <br>*@
+       
+    </div>
+
+    <div class="col-sm-auto" style="font-size: 10px">
+
+        <label style="margin-left:15px;  margin-bottom: 1px; margin-top: 10px; color: brown; font-size: 11px">Алименты: </label> <br>
+
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 1: </label>
+        @Html.TextBox("alim1", null, new { @class = "form-control" })
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 2: </label>
+        @Html.TextBox("alim2", null, new { @class = "form-control" })
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 3: </label>
+        @Html.TextBox("alim3", null, new { @class = "form-control" })
+        @*<label style="margin-bottom: 1px; margin-top: 2px;">Заемщик 4: </label>
+        @Html.TextBox("alim4", null, new { @class = "form-control" })*@
+
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 10px; color: brown; font-size: 11px">Кредиты: </label> <br>
+
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 1: </label>
+        @Html.TextBox("cred1", null, new { @class = "form-control" })
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 2: </label>
+        @Html.TextBox("cred2", null, new { @class = "form-control" })
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 3: </label>
+        @Html.TextBox("cred3", null, new { @class = "form-control" })
+        @*<label style="margin-bottom: 1px; margin-top: 8px;">Заемщик 4: </label>
+        @Html.TextBox("cred4", null, new { @class = "form-control" })*@
+
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 10px; color: brown; font-size: 11px">Кредитные карты: </label> <br>
+
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 1: </label>
+        @Html.TextBox("card1", null, new { @class = "form-control" })
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 2: </label>
+        @Html.TextBox("card2", null, new { @class = "form-control" })
+        <label style="margin-left: 15px; margin-bottom: 1px; margin-top: 2px;">Заемщик 3: </label>
+        @Html.TextBox("card3", null, new { @class = "form-control" })
+        @*<label style="margin-bottom: 1px; margin-top: 8px;">Заемщик 4: </label>
+        @Html.TextBox("card4", null, new { @class = "form-control" })*@
+
+        @* ----------------- [ СОХРАНИТЬ ] ---------------------- *@
+        @*<br><input type="submit" value="Сохранить" class="btn btn-primary" style="font-size: 10px; margin-right: 2%" />*@
+
+        @* ----------------- [ СОХРАНИТЬ ]  [ К Заявке ]   ---------------------- *@
+        <br><input type="submit" value="Сохранить и выйти" class="btn btn-primary" style="font-size: 10px; margin-right: 2%" />
+        @*@Html.ActionLink("Возврат к Заявке", "EditOrder", new { id = ViewBag.id_order }, new { @class = "btn btn-info", @style = "font-size: 10px" })*@
+
+       @*@Html.ActionLink("Расчет (предварительный) ", "CalcLoanRes", new { id_order = ViewBag.id_order }, new { @class = "btn btn-success", @style = "font-size: 10px; margin-bottom: 6px" })*@
+
+    </div>
+    
+}
+
+</body>
+
+</html>
+
+<script>
+    document.getElementById('price').onchange = CalcEmptyField;
+    document.getElementById('perv_vznos').onchange = CalcEmptyField;
+    //document.getElementById('zaim').onchange = CalcEmptyField;
+</script>
+
+@*<script>
+    document.getElementById('zaim').onchange = function () {
+        alert('Спасибо!')
+    }
+    document.getElementById('price').onchange = function () {
+        alert('Спасибо!')
+    }
+</script>*@
+
+

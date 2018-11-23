@@ -1,0 +1,77 @@
+﻿
+@model ASPNetAuthEmail.Models.CRM_Abonent
+
+<!DOCTYPE html>
+
+<html>
+
+<div style=" margin-left: 10%;">
+
+    <div>
+        @*<label>Продукт:</label> @Html.DisplayFor(m => m.ProductValue)*@
+        <label style="color: gray">Продукт:</label> @ViewBag.productname
+
+    </div>
+
+    <div>
+        <label style="color: gray">Сумма займа:</label> @Html.DisplayFor(m => m.zaim) ₽
+    </div>
+    <div>
+        <label style="color: gray">Ст-ть жилья:</label> @Html.DisplayFor(m => m.price) ₽
+    </div>
+    <div>
+        <label style="color: gray">Перв.взнос:</label> @Html.DisplayFor(m => m.perv_vznos) ₽
+    </div>
+    <div>
+        <label style="color: gray">Срок займа:</label> @Html.DisplayFor(m => m.srok) мес.
+    </div>
+    <div>
+        <label style="color: gray">Кол-во детей:</label> @Html.DisplayFor(m => m.dety) 
+    </div>
+    <div>
+        <label style="color: gray">Мат.капитал:</label> @Html.DisplayFor(m => m.Mat_kapital)
+    </div>
+
+
+    <div>
+            @if (Model != null)
+            {
+                @Html.ActionLink("Параметры займа", "EditParamsLoan", new { idklient = Model.id_ab, id_order = ViewBag.id_order }, new { @class = "btn btn-warning", @style = "font-size: 10px; margin-bottom: 6px" })
+                
+            }
+    </div>
+
+    @*<div>
+            <label>Несовершеннолетние дети:</label> @Html.DisplayFor(m => m.Dety)
+        </div>
+        <div>
+            <label>Сумма Материнского капитала:</label> @Html.DisplayFor(m => m.Mat_kapital)
+    </div>*@
+
+</div>
+
+        @*<label style="margin-bottom: 1px; margin-top: 8px;">Продукт: </label>
+            @Html.TextBox("ProductValue", null, new { @class = "form-control", @style = "font-size: 10px" })
+
+
+            <label style="margin-bottom: 1px; margin-top: 8px;">Сумма займа: </label>
+            @Html.TextBox("Zaim", null, new { @class = "form-control" })
+
+            <label style="margin-bottom: 1px; margin-top: 8px;">Срок займа: </label>
+            @Html.TextBox("Srok", null, new { @class = "form-control" })
+
+            <label>Срок займа</label>
+            @Html.DisplayFor(m => m.Srok)
+
+            <label>Несовершеннолетние дети</label>
+            @Html.DisplayFor(m => m.Dety)
+
+            <label>Сумма Материнского капитала</label>
+            @Html.DisplayFor(m => m.Mat_kapital)
+
+            <label>Прервоначальный взнос</label>
+            @Html.DisplayFor(m => m.Perv_vznos)*@
+
+</html>
+
+

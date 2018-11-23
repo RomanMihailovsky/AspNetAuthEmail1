@@ -1,0 +1,287 @@
+﻿
+@*@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}*@
+
+@*JSON Возвращение результатов Поиска*@
+@*<script type="text/javascript">
+
+    function jsonDateFormat(value) {
+
+        var months = ["янв", "фев", "мар", "апр", "май", "июн",
+                    "июл", "авг", "сен", "окт", "ноя", "дек"];
+
+        var pattern = /Date\(([^)]+)\)/;
+        var res = pattern.exec(value);
+        var dt = new Date(parseFloat(res[1]));
+        return dt.getDate() + "-" + months[ dt.getMonth()] + "-" + dt.getFullYear()
+    }
+
+    function OnSuccess(data) {
+        var results = $('#results'); // получаем нужный элемент
+        results.empty(); //очищаем элемент
+
+        for (var i = 0; i < data.length; i++) {
+
+            var dt = jsonDateFormat(data[i].Date);
+
+            results.append("<tr><td>"
+                           + data[i].id_Order + "</td><td>" + "&nbsp;" + "</td> <td class='text-right' width='100' >"
+                           + dt + "</td><td>" + "&nbsp;" + "</td><td>"
+                           + "<a href='/Tst/EditOrder/" + data[i].id_Order+ "'>"
+                           + data[i].SurName + "</a></td><td>" + "&nbsp;" + "</td><td>"
+                           + data[i].Name + "</td><td>"     + "&nbsp;" + "</td><td>"
+                           + data[i].Otch + "</td><td>" + "&nbsp;" + "</td><td>"
+                           + data[i].Phone + "</td><td>" + "&nbsp;" + "</td><td>"
+                           + data[i].Status + "</td><td>"   + "&nbsp;" + "</td><td>"
+                           + data[i].StageStatus /*+ "</td><td>" + "&nbsp;" + "</td><td>"  + data[i].UserName*/
+                           + "</td></tr>");
+        }
+
+    }
+</script>*@
+
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+@*<script src="/Scripts/jquery.validate.unobtrusive.min.js"></script>*@
+
+
+<script type="text/javascript">
+
+    function sendNotification(title, options) {
+        // Проверим, поддерживает ли браузер HTML5 Notifications
+        if (!("Notification" in window)) {
+            alert('Ваш браузер не поддерживает HTML Notifications, его необходимо обновить.');
+        }
+            // Проверим, есть ли права на отправку уведомлений
+        else if (Notification.permission === "granted") {
+            // Если права есть, отправим уведомление
+            var notification = new Notification(title, options);
+
+            function clickFunc() { window.open('http://localhost:65444') }
+
+            notification.onclick = clickFunc;
+        }
+            // Если прав нет, пытаемся их получить
+        else if (Notification.permission !== 'denied') {
+            Notification.requestPermission(function (permission) {
+                // Если права успешно получены, отправляем уведомление
+                if (permission === "granted") {
+                    var notification = new Notification(title, options);
+
+                } else {
+                    alert('Вы запретили показывать уведомления'); // Юзер отклонил наш запрос на показ уведомлений
+                }
+            });
+        }
+        else {
+            // Пользователь ранее отклонил наш запрос на показ уведомлений
+            // В этом месте мы можем, но не будем его беспокоить. Уважайте решения своих пользователей.
+        }
+    }
+
+</script>
+
+@*<script src="~/Scripts/jquery.signalR-2.3.0.js"></script>*@
+<!--Ссылка на автоматически сгенерированный скрипт хаба SignalR -->
+@*<script src="~/signalr/hubs"></script>*@
+
+<script type="text/javascript">
+    $(function () {
+
+        //$('#notification').hide();
+        var _msg = "111";
+
+        //var nHub = $.connection.nHub;  // 1
+
+        //var conn = $.hubconnection();   // 2
+        //var hubproxy = conn.createhubproxy('nHub'); // 2
+
+        //hubproxy.client.addMessage = function (message) { //  2
+        //    //$('#notification').append(message);
+        //    //_msg = message;
+        //    _msg = "hubproxy";
+        //};
+
+        $.connection.nHub.client.addMessage = function (message) { //  1
+            
+            $('#notification').empty();
+            $('#notification').append(message);
+
+            sendNotification('Сообщение CRM Vesta', {
+                body: message,
+                icon: 'logo.png',
+                dir: 'auto'
+            });
+
+        };
+
+        //$.connection.myHub.client.send = function (name, msg) {
+        //    alert("Пользователю: " + name + " Получено сообщение: " + msg);
+        //};
+
+        $.connection.myHub.client.message = function (name, msg) {
+
+            sendNotification('Пользователю ' + name, {
+                body: msg,
+                icon: 'logo.png',
+                dir: 'auto'
+            });
+            //alert("Пользователю: " + name + " Сообщение: " + msg);
+        };
+
+        $.connection.hub.start().done(function () {
+            //$.connection.myHub.server.send('1d552ef4-0e81-4b36-9642-0d22e84089af', "Отправка сообщения пользователю 'test' Вызовом метода send (myHub) из JavaScript");
+            //$.connection.nHub.server.send('Вызов метода хаба ***nHub*** из JavaScript');
+        });
+
+    });
+</script>
+
+
+@*@model IEnumerable<ASPNetAuthEmail.Models.CRM_TabOrd>*@
+@model ASPNetAuthEmail.Models.CRM_TabOrd_ViewModel
+
+@************ CRM_TabOrd_ViewModel необходим для работы со страницами ***************@
+
+<link href="~/Content/Site.css" rel="stylesheet" />
+@*<link rel="stylesheet" type="text/css" href="~/Content/jquery-ui-1.10.3.custom.min.css">*@
+
+@{
+    ViewBag.Title = "Личный кабинет";
+}
+
+
+<body>
+
+    @*класс для фиксированной панели navbar-fixed-top*@
+    <div class ="form-inline" style="font-size: 11px">
+
+        <p>
+            @ViewBag.iduser
+        </p>
+
+        <div class="navbar-btn">
+            <form method="get">
+                <input name="fsurname" type="text" placeholder="Поиск по фамилии..." onclick="this.value=''" style="font-size: 11px" />
+                <input type="submit" value="Поиск" />
+                <span style="font-size: 10px; margin-left: 2%">  @*@Html.Action("Pages", "Tst" )*@ </span>
+            </form>
+        </div>
+
+        @*<form method="get">           
+            <input name="fsurname" type="text" value="Поиск по фамилии..."  onclick="this.value=''" />
+        </form>*@
+
+        <p> </p>
+
+        @*========= JSON Поиск и Вывод результатов в Results ====================================*@
+
+        @*@using (Ajax.BeginForm("JsonGetCRM_TabOrd", new AjaxOptions { OnSuccess = "OnSuccess" }))
+        {
+            <input type="text" name="name" />
+            <input type="submit" value="Поиск" />
+        }
+        <br />
+        <div id="results"></div>*@
+        @*=======================================================================================*@
+
+    </div>
+
+
+@*<div class="container">*@
+
+    @*<div class=" panel-heading" style="font-size: 10px">*@
+            @*<h5>Список заявок</h5>*@
+
+            @*<div class="navbar-btn col-lg-offset-1">
+                    @Html.ActionLink("Добавить заявку", "Create", null, new { @class = "btn btn-default" })
+                </div>*@
+
+            @*<div class="navbar-btn col-lg-offset-3" style="word-spacing:25px">*@
+
+
+    <div class="panel panel-default" style="font-size: 10px;">
+        @*<table class="table table-striped table-condensed table-bordered table-hover">*@
+
+        <div class="navbar-btn">
+            <label style=" margin-left: 2%; margin-right: 2%; ">Список заявок</label>
+
+            @* ----------------- [ ДОБАВИТЬ ЗАЯВКУ ]  ---------------------- *@
+
+            @Html.ActionLink("Добавить заявку", "Create", null, new { @class = "btn btn-warning", @style = "font-size: 10px" } )
+
+        </div>
+
+        <div id="notification"></div>
+
+        <table class="table table-hover">
+            <tr>
+                <th class="text-right">№ </th>
+                @*<th class="text-center">Дата заявки</th>*@
+                @*<th class="text-center">Дата назнач</th>*@
+                <th class="text-center">Фамилия</th>
+                @*<th class="text-center">Имя</th>*@
+                @*<th class="text-center">Отч</th>*@
+                <th class="text-center">Контакт</th>
+                <th class="text-center" width="300">Статус</th>
+                @*<th class="text-center">Стадия</th>*@
+                @*<th class="text-center">Комментарий</th>*@
+                @*<th class="text-center">Владелец заявки</th>*@
+                @*<th class="text-center">Примечание</th>*@
+                @*<th class="text-right">Цена</th>*@
+            </tr>
+
+
+                @foreach (var item in Model.CRM_TabOrds)
+                {
+
+                  if (item.StageStatus == null)
+                            { item.StageStatus = "";}
+                  if (item.Name.Length == 0)
+                            { item.Name = " "; }
+                  if (item.Otch.Length == 0)
+                            { item.Otch = " "; }                    
+                  
+                    <tr class="@( item.Status == null ? "class-graylight" : item.Status.Contains("Закрыта") ? "class-graylight" : item.Status.Contains("Новая") ? "class-bluelight"
+                    : item.Status.Contains("Одобр") || item.StageStatus.Contains("Одобр") ? "class-greenlight"
+                    : item.Status.Contains("Возвращ") || item.StageStatus.Contains("Отказ") ? "class-pinklight" : "class-creamlight")" style="font-size: 10px">
+
+                    <td class="text-left" width="100">@item.id_Order</td>
+
+                    @*<td class="text-left" width="100">@item.Date.ToShortDateString()</td>*@
+
+                        <td class="text-left" width="150" style="font-size: 12px">@Html.ActionLink(item.SurName + ' ' + item.Name.Substring(0, 1) + '.' + item.Otch.Substring(0, 1) + '.', "EditOrder", new { id = item.id_Order })</td>
+
+                    @*<td class="text-left" width=" 100">@item.Name.Substring(0, 1).</td>
+                    <td class="text-left" width=" 100">@item.Otch.Substring(0, 1).</td>*@
+
+                    <td class="text-left" width=" 150">@item.Phone </td>
+
+                    <td class="text-left" width=" 150">@item.Status </td>
+
+                    @*<td class="text-left" width=" 150">@item.StageStatus </td>*@
+
+                    @*<td class="text-left" width=" 150">@item.Note</td>*@
+
+                    @*<td class="text-left" width=" 100">@item.UserName </td>*@
+
+                    </tr>
+                 }
+                
+
+            
+
+
+        </table>
+    </div>
+
+
+
+        @*</div>*@
+
+    @*</div>*@
+
+</body>
+
+

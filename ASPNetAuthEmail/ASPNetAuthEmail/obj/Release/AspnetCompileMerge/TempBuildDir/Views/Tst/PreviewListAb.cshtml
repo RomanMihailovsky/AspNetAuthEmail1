@@ -1,0 +1,123 @@
+﻿@*@model IEnumerable<ASPNetAuthEmail.Models.Game>*@
+@*@model ASPNetAuthEmail.Models.CRM_Doc*@
+
+@model IEnumerable<ASPNetAuthEmail.Models.CRM_AbKnt>
+@*@model ASPNetAuthEmail.Models.CRM_DocsViewModel*@
+
+
+<link href="~/Content/Site.css" rel="stylesheet" />
+
+@{
+    ViewBag.Title = "Личный кабинет";
+}
+
+<div class="panel panel-default" style="font-size: 10px;">
+    @*style="font-size: 11px; color: brown">*@
+    @*<div >*@
+
+        <div class="navbar-btn">
+            <label style=" margin-left: 2%; margin-right: 1%; margin-bottom: 2%;">Список участников заявки</label>
+
+            @* ----------------- СПИСОК ЗАЯВОК  [ ДОБАВИТЬ УЧАСТНИКА ЗАЯВКИ ]   ---------------------- *@
+
+            @if (  ViewBag.Id_order != 0  )
+            { 
+                           @Html.ActionLink("Добавить участника заявки", "EditAbonent", new { id = -1, idorder = @ViewBag.Id_order }, new
+                           {
+                               @class = "btn btn-warning" , @style = "font-size: 10px; margin-right: 5px; margin-bottom : 10px"
+                           })
+
+                            @Html.Action("CmbBx_Realtors", new { idorder = @ViewBag.Id_order })
+                
+                            @*@Html.Action("CmbBx_Realtors", new { idorder = @ViewBag.Id_order })*@                
+                            @*@Html.ActionLink("Добавить риэлтора в заявку", "AddSaveRealtor", new { idorder = @ViewBag.Id_order }, new { @class = "btn btn-warning", @style = "font-size: 10px; margin-left: 5px" })*@
+             }
+        </div>
+
+        <table class="table table-sm">
+            <thead class="thead-light">
+                <tr>
+                    @*<th class="text-center">id_petit</th>*@
+                    <th class="text-center">Фамилия</th>
+                    @*<th class="text-center">Имя</th>
+                    <th class="text-center">Отчество</th>*@
+                    <th class="text-center">Контакт</th>
+                    <th class="text-center">Тип участника</th>
+                    <th class="text-center">Соотв.</th>
+                    <th class="text-center">Удал.</th>
+                </tr>
+            </thead> 
+            
+            @foreach (var item in Model) {
+                <tr>
+                    @*<td class="text-left" width=" 10">@item.id_petit</td>*@
+                    @*<td class="text-left" width=" 200">@item.SurName </td>*@
+
+                    @if (item.Name.Length == 0)
+                        { item.Name = " "; }
+                    @if (item.Otch.Length == 0)
+                        { item.Otch = " "; }       
+
+                    @if (item.Prioritet == 3)
+                    {
+                        <td class="text-left" width=" 200">@(item.SurName + ' ' + item.Name.Substring(0, 1) + '.' + item.Otch.Substring(0, 1) + '.')</td>
+                    }
+                    else
+                    {
+                        <td class="text-left" width="200" style="font-size: 12px">@Html.ActionLink(item.SurName + ' ' + item.Name.Substring(0, 1) + '.' + item.Otch.Substring(0, 1) + '.', "EditAbonent", new { id = item.id_Abonent, idorder = @ViewBag.Id_order })</td>
+                    }
+
+                    @*<td class="text-left" width=" 200">@item.Name </td>
+                    <td class="text-left" width=" 200">@item.Otch </td>*@
+                    <td class="text-left" width=" 200">@item.Kontakt </td>
+
+                    @if (item.Prioritet == 1)
+                    {
+                        <td class="text-left" width=" 200">Основной</td>
+                    }
+                    else if (item.Prioritet == 3)
+                    {
+                        <td class="text-left" width=" 200">Риэлтор</td>
+                    }
+                    else
+                    { 
+                        <td class="text-left" width=" 200">-</td>
+                    }
+                    
+
+                    @if (item.PredSolSB == 1)
+                    {
+                        <td class="text-left" width=" 200">Да</td>
+                    }
+                    else if (item.PredSolSB == -1)
+                    {
+                        <td class="text-left" width=" 200">Нет</td>
+                    }
+                    else
+                    { 
+                        <td class="text-left" width=" 200">-</td>
+                    }
+                    
+                    <td>
+
+                        @using (Html.BeginForm("RemoveAbonent", "Tst"))
+                        {
+                            if (item.Prioritet != 1)
+                            {                                
+                                @Html.Hidden("id_order", item.id_order)
+                                @Html.Hidden("id_petit", item.id_petit)
+                                //@Html.HiddenFor(x => x.ReturnUrl)
+                                <input class="btn btn-sm btn-danger" type="submit" value="X" style="font-size: 10px;" />
+                            }
+                        }
+
+                    </td>
+
+                </tr>
+}
+
+</table>
+
+    @*</div>*@
+</div>
+

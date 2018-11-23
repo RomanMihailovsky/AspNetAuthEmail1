@@ -1,0 +1,27 @@
+﻿// Настройка блока с ползунком.
+.slider {
+width:230px;
+height:11px;
+background:url(slider-bg.png); // Фон ползунка.
+position:relative;
+margin:0 auto;
+padding:0 10px;
+}
+// Сам ползунок
+.ui-slider-handle {
+width:24px;
+height:24px;
+position:absolute;
+top:-7px;
+margin-left:-12px;
+z-index:200;
+background:url(slider-button.png);
+}
+// Фон ползунка при перемещении.
+.ui-widget-header {
+background:url(fill.png) no-repeat left;
+height:8px;
+left:1px;
+top:1px;
+position:absolute;
+}

@@ -1,0 +1,455 @@
+﻿@*<script src="/Scripts/jquery-1.10.2.js"></script>*@
+<script src="/Scripts/jquery-3.3.1.js"></script>
+<script src="/Scripts/jquery.maskedinput.min.js"></script>
+<script src="/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+@*<script src="~/Scripts/jquery.maskedinput.js"></script>*@
+
+<script>
+    $(function () {
+        $("#Phone").mask("(999)999-99-99");
+        $("#BirthDay").mask("99.99.9999", { placeholder: "дд.мм.гггг" });
+    });   
+
+</script>
+
+
+<script type="text/javascript">
+
+    function OnBegin() {
+        alert("Происходит отправка запроса");
+    }
+
+    //function OnSuccess(e) { //function CouponSubmitted(data) in the question
+    //    var json = e.get_response().get_object();
+    //    alert(json.success);
+    //}
+
+    function OnSuccess(data) {
+        var results = $('#results'); // получаем нужный элемент
+        results.empty(); //очищаем элемент
+        for (var i = 0; i < data.length; i++) {
+            results.append('<li>' + data[i].Description + '</li>'); // добавляем данные в список
+        }
+    }
+
+</script>
+
+
+@*<script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+
+<script src="~/signalr/hubs"></script>
+
+<script type="text/javascript">
+    $(function () {
+
+        var notificationhub = $.connection.notificationHub;
+
+        notificationhub.client.displayMessage = function (message) {
+
+            $('#notification').html(message);
+        };
+
+        $.connection.hub.start();
+
+    });
+</script>*@
+
+<!DOCTYPE html>
+@*//TST/Edit.cshtml*@
+
+<html>
+
+@model ASPNetAuthEmail.Models.CRM_TabOrd
+
+@{
+    ViewBag.Title = "Редактирование заявки";
+}
+
+
+@*<div class="row"  class="panel">*@
+    @*<div class=" panel-heading" style="background: #eae4c5">
+            <h4>"@Html.DisplayFor(model => model.SurName) @Html.DisplayFor(model => model.Name) @Html.DisplayFor(model => model.Otch)"</h4>
+        </div>*@
+
+        @*@Html.Action("JsonGetOptions")*@
+
+        @*========= Поле Поиска и results - Вывод результатов ====================================*@
+        @*, OnBegin = "OnBegin", OnComplete = "OnComplete", OnFailure = "OnFailure"*@
+
+        @*@using (Ajax.BeginForm("JsonGetOptions", new AjaxOptions {  OnSuccess = "OnSuccess"  }))
+        {
+            <input type="text" name="name" />
+            <input type="submit" value="Поиск" />
+        }
+        <br />
+        <div id="results"></div>*@
+
+        @*=======================================================================================*@
+
+
+
+        @using (Html.BeginForm("EditOrder", "Tst",  FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <p> </p>
+            
+            <div @*style=" margin-left: 2%;"*@ @*class="form-group"*@ >
+                @if (ViewBag.idorder == 0)
+                { 
+                    <h5>Заявка (Создание): @Html.DisplayFor(model => model.SurName) @Html.DisplayFor(model => model.Name) @Html.DisplayFor(model => model.Otch)</h5>
+                }
+                else
+                {
+                    <h5>Заявка @Html.Display("id_Order") (Редактирование): @Html.DisplayFor(model => model.SurName) @Html.DisplayFor(model => model.Name) @Html.DisplayFor(model => model.Otch)</h5>
+                }
+        
+            </div>
+
+            <p></p>           
+            
+            <div @*class="col-sm-5"*@ style="font-size: 10px">
+
+                @*@Html.HiddenFor(m => m.GameId)*@
+                @*@Html.TextBoxFor( m => m.Status )*@
+
+                @************Без нее при сохранении id_Order == 0 ***********@
+                @Html.HiddenFor(m => m.id_Order)
+                @Html.HiddenFor(m => m.id_Klient)
+
+                @if (ViewBag.idorder != 0)
+                {
+                    <table @*cellpadding="5"*@ @*cellspacing="0"*@ border="0">
+                        <th width="300px">
+                            @*<label style=" color: gray">Заявка:</label> @Html.Display("id_Order")*@
+                            @*<label style="color: gray">Клиент:</label> @Html.Display("id_Klient")*@
+
+                            <div>
+                                <label style="color: gray">Дата заявки:</label>   <span style="color: navy "> @Html.Display("Date") </span> @*<p> </p>*@
+                            </div>
+
+                            <div>
+                                <label style="color: gray">Автор:</label> @Html.Display("UserName")
+                            </div>
+
+                            <div>
+                                <label style="color: gray">Статус:</label> @Html.Display("Status")
+                            </div>
+
+                            <div>
+                                <label style="color: gray">Стадия:</label> @Html.Display("StageStatus")
+                            </div>
+
+                            <br>
+                            @*------------------------Список опций данной заявки ------------------*@
+                            @if (Model != null)  
+                            {
+                                if (Model.options == "")
+                                { 
+                                    @Html.Action("PrevOptionsProduct", new { id_product = Model.ProductValue, options = "0" })
+                                }
+                                else
+                                {                                     
+                                    @Html.Action("PrevOptionsProduct", new { id_product = Model.ProductValue, options = Model.options })
+                                }
+                            }
+                            
+                            <br>
+
+                            <div>
+                                @if (Model != null && Model.zaim != null && Model.zaim > 0)
+                                {
+                                    @Html.ActionLink("Расчет (предварительный) ", "CalcLoanRes", new { id_order = Model.id_Order }, new { @class = "btn btn-success", @style = "font-size: 10px; margin-bottom: 6px" })
+                                }
+                            </div>
+
+                        </th>
+
+                        @*----------- Параметры заявки --------------------------*@
+                        <th> 
+                            @if (Model != null)  
+                            {
+                                @Html.Action("PreviewParamsLoan", new { idklient = Model.id_Klient, id_order = Model.id_Order })
+                            }
+                        </th>
+
+                    </table>
+                }
+
+                @*<p> </p>*@
+
+                @*<div>
+                    @ViewBag.idorder
+                </div>*@
+                
+                @if ( ViewBag.idorder == 0 )
+                {
+                    
+                    <label style="margin-bottom: 1px; margin-top: 8px;">Фамилия: </label>
+                    @Html.TextBox("SurName", null, new { @class = "form-control"  })
+                    @Html.ValidationMessageFor(model => model.SurName) <br>
+
+                    <label style="margin-bottom: 1px; margin-top: 8px;">Имя: </label>
+                    @Html.TextBox("Name", null, new { @class = "form-control"  })
+                    @Html.ValidationMessageFor(model => model.Name) <br>
+
+                    <label style="margin-bottom: 1px; margin-top: 8px;">Отчество: </label>
+                    @Html.TextBox("Otch", null, new { @class = "form-control", @style = "margin-bottom: 12px;" })
+                    @Html.ValidationMessageFor(model => model.Otch) <br>
+                    
+                    <label style="margin-bottom: 1px; margin-top: 8px;">Контактный телефон: </label>
+                    @Html.TextBox("Phone", null, new { @class = "form-control"  })
+                    @Html.ValidationMessageFor(model => model.Phone) <br>
+                    
+                    <label style="margin-bottom: 1px; margin-top: 8px;">Дата рождения: </label>
+                    @Html.TextBox("BirthDay", null, new { @class = "form-control" })                    
+                    @Html.ValidationMessageFor(model => model.BirthDay) <br>
+                    
+                    @*<label style="margin-bottom: 1px; margin-top: 8px;">Источник заявки </label>
+                    @Html.TextBox("IdSourceOrder", null, new { @class = "form-control" })                    
+                    @Html.ValidationMessageFor(model => model.IdSourceOrder) <br>*@                    
+                    
+                    @*@Html.CheckBox("Delta", true )*@
+                    
+                    @Html.Action("CmbBx_CRM_SPR_SourceOrder")
+                    
+                    
+                    @*@Html.DropDownListFor(model => model.IdSourceOrder, ViewBag.SourceList as SelectList,
+                                 new { @class = "form-control", @id = "ddSourceList", @style = "font-size: 11px"})*@                    
+                    
+                    
+                    @* ******************************** Отображение инф.сообщений при СОЗДАНИИ ЗАЯВКИ ******************* *@
+                    if (TempData["messagedanger"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["messagedanger"]</div>
+                    }
+                    
+                    @*<label>
+                        @Html.EditorFor(x => x.Delta)
+                        @Html.CheckBox("Delta", true )
+                        <span>Даю согласие на <a class="arr" href="/HTML/IAgree.html"> обработку персональных данных и отправку запроса в БКИ</a> <br>
+                        </span> и <span>принимаю <a class="arr" href="/HTML/IAgree.html">условия соглашения</a> о простой электронной подписи</span>
+                    </label>*@
+                   
+                    @*@Html.TextBoxFor( m => m.Phone, new {mask = "(999) 999-9999" })*@
+                    
+                    @*<input  id="phone" type="text">*@
+                    
+                }
+                else
+                { 
+                    @Html.HiddenFor(m => m.id_Order)
+                    
+                    @Html.HiddenFor(m => m.SurName)        
+                    @Html.HiddenFor(m => m.Name)
+                    @Html.HiddenFor(m => m.Otch)
+                    @Html.HiddenFor(m => m.Phone)
+                    @Html.HiddenFor(m => m.BirthDay)
+                    <br>
+                    
+                    @* ******************************** Отображение инф.сообщений ***************************** *@
+                    
+                    if (TempData["messagedanger"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["messagedanger"]</div>
+                    }
+                    
+                    if (TempData["messagesuccess"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["messagesuccess"]</div>
+                    }
+                    
+                    <div><span id="notification" style="color:red;font-size:15px;"></span></div>
+                    
+                    @*============ Отображение кнопки "ЗАЯВКА СФОРМИРОВАНА" =========================*@
+                    @*if (Model != null)
+                    {
+                        if (Model.Id_status == 13 /*Предпроверка СБ*/ && Model.PredSolSB == 5 || Model.Id_status == 35 /*Пред-ка СБ(Положительно)*/
+                        || (Model.Id_status == 14 /*Предварительное заключение СБ, ИСУР */  && (Model.IdStageStatus == 12 /*Предпр-ка СБ(+)*/ || Model.IdStageStatus == 11 /*Устранить замечания СБ*/))
+                        )
+                        {                            
+                            @Html.ActionLink("Заявка сформирована", "OrderFormed", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                        }
+                        else
+                        { 
+                            @Html.ActionLink("Проверка СБ", "SendtoPreviewDepSec", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                        }
+                    }*@                    
+                    @*================================================================================*@
+                    
+                    @*<span> &nbsp </span>                    
+                    @Html.ActionLink("Пров.АИЖК(З-к)", "SendtoAHML", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                    <span> &nbsp </span>                    
+                    @Html.ActionLink("Пров.АИЖК(ПИ)", "SendtoAHML_Property", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })*@
+                    
+                    
+
+                }
+
+                @*@Html.ValidationSummary()*@
+
+                @*<p> </p>*@
+
+                <label>Комментарий</label>
+                @Html.TextArea("Note", null, new { @class = "form-control", @style = "font-size: 10px; width: 300px; max-width: 300px;", rows = 4 })
+
+                <p> </p>
+
+                @* ----------------- [ СОХРАНИТЬ ]  [ К списку ]   ---------------------- *@
+
+                 <input type="submit" value="Сохранить и выйти" class="btn btn-primary" style="font-size: 10px; margin-right: 2%" /> 
+                 @Html.ActionLink("Вернуться к списку заявок", "Index", null, new { @class = "btn btn-info", @style = "font-size: 10px" })  
+
+                @*============ Отображение кнопки "ЗАЯВКА СФОРМИРОВАНА" =========================*@
+                @*@if (Model != null)
+                {
+                    if (Model.Id_status == 13 /*Предпроверка СБ*/ && Model.PredSolSB == 5 || Model.Id_status == 35 /*Пред-ка СБ(Положительно)*/
+                    || (Model.Id_status == 14 /*Предварительное заключение СБ, ИСУР */  && (Model.IdStageStatus == 12 /*Предпр-ка СБ(+)*/ || Model.IdStageStatus == 11 /*Устранить замечания СБ*/))
+                    )
+                {
+                    @Html.ActionLink("Заявка сформирована", "OrderFormed", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                }
+                else
+                {
+                    @Html.ActionLink("На проверку СБ", "SendtoPreviewDepSec", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                }
+                }*@
+                @*================================================================================*@
+
+            </div>
+            
+             @*<div class="col-sm-5" style="font-size: 10px">
+
+            </div>*@
+            
+    }
+
+            @if (ViewBag.idorder != 0)
+            {
+
+                <p> </p>
+                @* ******************************** СПИСОК УЧАСТНИКОВ ЗАЯВКИ ***************************** *@
+                @Html.Action("PreviewListAb")
+
+                <p> </p><p> </p>
+
+                @*============ Отображение кнопки "ЗАЯВКА СФОРМИРОВАНА" =========================*@
+                if (Model != null)
+                {
+                    if (Model.Id_status == 13 /*Предпроверка СБ*/ && Model.PredSolSB == 5 || Model.Id_status == 35 /*Пред-ка СБ(Положительно)*/
+                    || (Model.Id_status == 14 /*Предварительное заключение СБ, ИСУР */  && (Model.IdStageStatus == 12 /*Предпр-ка СБ(+)*/ || Model.IdStageStatus == 11 /*Устранить замечания СБ*/))
+                    )
+                    {
+                        @Html.ActionLink("Заявка сформирована", "OrderFormed", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Пров.СБ", "SendtoPreviewDepSec", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                    }
+                }
+                @*================================================================================*@
+
+                <span> &nbsp </span>
+                @Html.ActionLink("Пров.АИЖК(З-к)", "SendtoAHML", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+                <span> &nbsp </span>
+                @Html.ActionLink("Пров.АИЖК(ПИ)", "SendtoAHML_Property", new { id_order = Model.id_Order }, new { @class = "btn btn-danger", @style = "font-size: 10px; margin-bottom: 6px" })
+            }
+
+
+@*</div>*@
+
+
+</html>
+
+
+@*@foreach (var property in ViewData.ModelMetadata.Properties)
+    {
+        switch (property.PropertyName)
+        {
+            case "Id_status":
+                break;
+            case "Id_User":
+                break;
+            case "DateAssigned":
+                break;
+            //case "ImageMimeType":
+            //    break;
+            default:
+                <div class="form-group">
+
+                    <label>@(property.DisplayName ?? property.PropertyName)</label>
+
+                    @if (property.PropertyName == "Note")
+                    {
+                        @Html.TextArea(property.PropertyName, null,
+                                  new { @class = "class-white", rows = 4 })
+                    }
+                    else
+                        if (property.PropertyName == "Date" || property.PropertyName == "Status"
+                            || property.PropertyName == "StageStatus" || property.PropertyName == "UserName"
+                            || property.PropertyName == "id_Order" || property.PropertyName == "id_Klient")
+                        {
+                            @Html.Display(property.PropertyName);
+                        }
+                        else
+                        {
+                            @Html.TextBox(property.PropertyName, null, new { @class = "class-white" })
+                        }
+                    @Html.ValidationMessage(property.PropertyName)
+                </div>
+                    break;
+        }
+    }*@
+
+
+
+@*--------------- Angular фрагмент -----------------------*@
+@*<body ng-controller="purchaseController">
+        <input class="form-control" ng-model="text" placeholder="Название" />
+        <input type="number" class="form-control" ng-model="price" placeholder="Цена" />
+        <button class="btn btn-default" ng-click="addItem(text, price)">Добавить</button>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Предмет</th>
+                    <th>Цена</th>
+                    <th>Куплено</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in list.items">
+                    <td>{{item.purchase}}</td>
+                    <td>{{item.price}}</td>
+                    <td><input type="checkbox" ng-model="item.done" /></td>
+                </tr>
+            </tbody>
+        </table>
+    </body>*@
+
+
+@*<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.10/angular.min.js"></script>
+    <script>
+        // **************** Модель ************************
+        var model = {
+            items: [
+                { purchase: "Хлеб", done: false, price: 15.9 },
+                { purchase: "Масло", done: false, price: 60 },
+                { purchase: "Картофель", done: true, price: 22.6 },
+                { purchase: "Сыр", done: false, price: 310 }
+            ]
+        }
+
+        // ************** Определение Модуля *****************
+        var purchaseApp = angular.module("purchaseApp", []);
+
+        purchaseApp.controller("purchaseController", function ($scope) {
+            $scope.list = model;
+            $scope.addItem = function (text, price) {
+                price = parseFloat(price); // преобразуем введенное значение к числу
+                if (text != "" && !isNaN(price)) // если текст установлен и введено число, то добавляем
+                {
+                    $scope.list.items.push({ purchase: text, price: price, done: false });
+                }
+            }
+        })
+
+    </script>*@

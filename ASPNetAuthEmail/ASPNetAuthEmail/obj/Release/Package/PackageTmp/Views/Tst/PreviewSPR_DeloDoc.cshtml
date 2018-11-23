@@ -1,0 +1,16 @@
+﻿
+@model IEnumerable<ASPNetAuthEmail.Models.SPR_DeloDoc>
+
+<label style="color: navy">Выберите тип документа</label>
+
+<select name="typedoc" style="margin-top: 0px; margin-bottom: 20px">
+
+    <option selected value="0"></option>
+
+    @foreach (var item in Model)
+    {
+        <option value="@item.id_spr">@item.description.Trim()</option>
+    }
+
+</select>
+

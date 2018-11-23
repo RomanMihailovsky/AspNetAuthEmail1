@@ -1,0 +1,17 @@
+﻿@model IEnumerable<ASPNetAuthEmail.Models.CRM_Option>
+
+<div>    
+    <label style="color: navy">Опции продукта:</label>
+</div>
+
+@foreach (var item in Model)
+{
+    <div>
+        @*<label><input type="checkbox" id="@item.id_Option" />@item.NameOp.Trim()</label>*@                
+        <label>@item.NameOp.Trim()</label>
+    </div>
+}
+
+
+
+

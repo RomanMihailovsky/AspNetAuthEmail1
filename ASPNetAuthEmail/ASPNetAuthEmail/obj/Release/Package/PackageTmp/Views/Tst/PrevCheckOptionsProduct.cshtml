@@ -1,0 +1,81 @@
+﻿
+@model IEnumerable<ASPNetAuthEmail.Models.CRM_Option>
+
+<script>
+
+    // ********** Формирование в input элементе с id = "options" *******************
+    function OptionsInString() {
+        var options = "";
+        var checkedInp;
+        var inputs = document.getElementsByTagName('input');
+        for (var i = 0; i < inputs.length; i++) {
+            if (inputs[i].type == 'checkbox' && inputs[i].checked) {
+                checkedInp = inputs[i].id;
+                options = options.concat(inputs[i].id.toString(), ',');
+            }
+        }
+
+        if (options.length > 1) {
+            options = options.substring(0, options.length - 1);
+        }
+        
+        document.getElementById('options').value = options;
+
+        //alert(options);
+    }
+
+    // ********** Отметить опции при загрузке страницы ********************
+    function funonload()
+    {
+        var options = document.getElementById('options').value;
+        var inputs = document.getElementsByTagName('input'); // inputs - Тэг элемента
+        for (var i = 0; i < inputs.length; i++)
+        {
+            if ( inputs[i].type == 'checkbox' )
+            {
+                if (options.indexOf(inputs[i].id.toString()) >= 0) // Если в options = "3,4,6" содержится id = 4 например
+                {
+                   inputs[i].checked = true;
+                }
+            }
+        }
+
+    }
+
+    // ****** Не работает
+    //$(document).ready(function ()
+    //{
+    //    document.getElementById('options').value = "*************";
+    //});
+    
+
+</script>
+
+
+<!DOCTYPE html>
+
+<html>
+
+     
+<body onload="funonload();">
+    
+    <div>
+        <label style="color: navy">Опции продукта:</label>
+    </div>
+
+    @foreach (var item in Model)
+    {
+        <div>
+            <label style="font-size: 10px"><input type="checkbox" id="@item.id_Option" onchange="OptionsInString()" />@item.NameOp.Trim()</label>
+        </div>
+    }
+
+    <input class="form-control" id="options" name="options" type="text" value="@ViewBag.in_options" @*style="display: none"*@ />
+
+</body>
+
+</html>
+
+
+
+

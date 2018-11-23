@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <setParameter name="IIS Web Application Name" value="serverinet/packASPNet" />
+  <setParameter name="DefaultConnection-Web.config Connection String" value="Data Source=(LocalDb)\v11.0;AttachDbFilename=|DataDirectory|\aspnet-ASPNetAuthEmail-20171222013312.mdf;Initial Catalog=aspnet-ASPNetAuthEmail-20171222013312;Integrated Security=True" />
+  <setParameter name="Ikur20171023-Web.config Connection String" value="Data Source=192.168.7.23;Initial Catalog=Ikur20171023;Integrated Security=False;User ID=Office;Password=!Икур\доп" />
+  <setParameter name="Ikur20171023_-Web.config Connection String" value="Data Source=192.168.7.23;Initial Catalog=Ikur20171023_;Integrated Security=False;User ID=Office;Password=!Икур\доп" />
+</parameters>
